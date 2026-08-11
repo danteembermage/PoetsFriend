@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Poetry IDE</title>
+    <style>
+        :root {
+            --bg-color: #1e1e1e;
+            --panel-bg: #2d2d2d;
+            --text-color: #d4d4d4;
+            --accent-color: #569cd6;
+            --border-color: #404040;
+            --highlight: #c586c0;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* Loading Screen */
+        #loading-screen {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-color: var(--bg-color);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        #loading-screen h1 { margin-bottom: 20px; font-weight: 300; }
+        .progress-container {
+            width: 300px;
+            height: 10px;
+            background-color: var(--panel-bg);
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        #loading-bar {
+            width: 0%;
+            height: 100%;
+            background-color: var(--accent-color);
+            transition: width 0.1s;
+        }
+        .hidden { display: none !important; }
+
+        /* Main IDE Layout */
+        #ide-container {
+            display: flex;
+            flex: 1;
+            height: 100%;
+        }
+
+        /* Editor */
+        #editor-pane {
+            flex: 3;
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid var(--border-color);
+        }
+
+        #editor {
+            flex: 1;
+            background-color: var(--bg-color);
+            color: #ce9178; /* Poetic text color */
+            border: none;
+            padding: 40px;
+            font-family: 'Georgia', serif;
+            font-size: 1.4rem;
+            line-height: 1.8;
+            resize: none;
+            outline: none;
+        }
+
+        /* Sidebar Suggestions */
+        #suggestion-pane {
+            flex: 1;
+            min-width: 300px;
+            background-color: var(--panel-bg);
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        .pane-header {
+            padding: 20px;
+            background-color: #252526;
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        
+        .pane-header h2 {
+            font-size: 1.1rem;
+            font-weight: 400;
+        }
+        
+        #target-word {
+            color: var(--highlight);
+            font-weight: bold;
+            font-family: monospace;
+        }
+
+        .suggestion-group {
+            padding: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .suggestion-group h3 {
+            font-size: 0.9rem;
+            color: var(--accent-color);
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .word-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .word-badge {
+            background-color: #3e3e42;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .word-badge:hover {
+            background-color: var(--accent-color);
+            color: #fff;
+        }
+
+        /* Scrollbars */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-color); }
+        ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #555; }
+    </style>
+</head>
+<body>
+
+    <!-- Loading Screen -->
+    <div id="loading-screen">
+        <h1>Initializing Poetry Engine...</h1>
+        <div class="progress-container">
+            <div id="loading-bar"></div>
+        </div>
+        <p id="loading-text" style="margin-top: 15px; color: #888; font-size: 0.9rem;">Loading dictionary...</p>
+    </div>
+
+    <!-- IDE Container -->
+    <div id="ide-container" class="hidden">
+        <div id="editor-pane">
+            <textarea id="editor" placeholder="Start typing your poem here..."></textarea>
+        </div>
+        <div id="suggestion-pane">
+            <div class="pane-header">
+                <h2>Suggestions for: <span id="target-word">...</span></h2>
+            </div>
+            
+            <div class="suggestion-group">
+                <h3>True Rhymes</h3>
+                <div id="rhyme-list" class="word-list">
+                    <span style="color: #666;">Type a word to see rhymes...</span>
+                </div>
+            </div>
+
+            <div class="suggestion-group">
+                <h3>Alliteration</h3>
+                <div id="alliteration-list" class="word-list"></div>
+            </div>
+
+            <div class="suggestion-group">
+                <h3>Consonance (Near Rhyme)</h3>
+                <div id="consonance-list" class="word-list"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="poetside.js"></script>
+</body>
+</html>
